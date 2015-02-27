@@ -222,9 +222,9 @@ ngx_http_access_inet6(ngx_http_request_t *r, ngx_http_access_loc_conf_t *alcf,
         u_char  mt[NGX_INET6_ADDRSTRLEN];
         u_char  at[NGX_INET6_ADDRSTRLEN];
 
-        cl = ngx_inet6_ntop(p, ct, NGX_INET6_ADDRSTRLEN);
-        ml = ngx_inet6_ntop(rule6[i].mask.s6_addr, mt, NGX_INET6_ADDRSTRLEN);
-        al = ngx_inet6_ntop(rule6[i].addr.s6_addr, at, NGX_INET6_ADDRSTRLEN);
+        cl = ngx_inet6_ntop(p, 0, 0, ct, NGX_INET6_ADDRSTRLEN);
+        ml = ngx_inet6_ntop(rule6[i].mask.s6_addr, 0, 0, mt, NGX_INET6_ADDRSTRLEN);
+        al = ngx_inet6_ntop(rule6[i].addr.s6_addr, 0, 0, at, NGX_INET6_ADDRSTRLEN);
 
         ngx_log_debug6(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
                        "access: %*s %*s %*s", cl, ct, ml, mt, al, at);

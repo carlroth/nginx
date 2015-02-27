@@ -2029,7 +2029,8 @@ ngx_resolver_process_ptr(ngx_resolver_t *r, u_char *buf, size_t n,
         expire_queue = &r->addr_expire_queue;
 
         addr = htonl(addr);
-        name.len = ngx_inet_ntop(AF_INET, &addr, text, NGX_SOCKADDR_STRLEN);
+        name.len = ngx_inet_ntop(AF_INET, &addr, 0, 0,
+                                 text, NGX_SOCKADDR_STRLEN);
         name.data = text;
 
         goto valid;
@@ -2076,7 +2077,9 @@ invalid_in_addr_arpa:
         tree = &r->addr6_rbtree;
         expire_queue = &r->addr6_expire_queue;
 
-        name.len = ngx_inet6_ntop(addr6.s6_addr, text, NGX_SOCKADDR_STRLEN);
+        /* scoped addresses should not be in the resolver */
+        name.len = ngx_inet6_ntop(addr6.s6_addr, 0, 0,
+                                  text, NGX_SOCKADDR_STRLEN);
         name.data = text;
 
         goto valid;
