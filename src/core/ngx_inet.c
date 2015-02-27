@@ -215,7 +215,8 @@ ngx_sock_ntop(struct sockaddr *sa, u_char *text, size_t len, ngx_uint_t port)
             text[n++] = '[';
         }
 
-        n = ngx_inet6_ntop(sin6->sin6_addr.s6_addr, &text[n], len);
+        n = ngx_inet6_ntop(sin6->sin6_addr.s6_addr, sin6->sin6_scope_id, 0,
+                           &text[n], len);
 
         if (port) {
             n = ngx_sprintf(&text[1 + n], "]:%d",
@@ -243,7 +244,8 @@ ngx_sock_ntop(struct sockaddr *sa, u_char *text, size_t len, ngx_uint_t port)
 
 
 size_t
-ngx_inet_ntop(int family, void *addr, u_char *text, size_t len)
+ngx_inet_ntop(int family, void *addr, int scope, int escape,
+              u_char *text, size_t len)
 {
     u_char  *p;
 
@@ -260,7 +262,7 @@ ngx_inet_ntop(int family, void *addr, u_char *text, size_t len)
 #if (NGX_HAVE_INET6)
 
     case AF_INET6:
-        return ngx_inet6_ntop(addr, text, len);
+        return ngx_inet6_ntop(addr, scope, escape, text, len);
 
 #endif
 
@@ -273,7 +275,8 @@ ngx_inet_ntop(int family, void *addr, u_char *text, size_t len)
 #if (NGX_HAVE_INET6)
 
 size_t
-ngx_inet6_ntop(u_char *p, u_char *text, size_t len)
+ngx_inet6_ntop(u_char *p, int s, int e,
+               u_char *text, size_t len)
 {
     u_char      *dst;
     size_t       max, n;
@@ -343,6 +346,14 @@ ngx_inet6_ntop(u_char *p, u_char *text, size_t len)
 
     if (n == 12) {
         dst = ngx_sprintf(dst, "%ud.%ud.%ud.%ud", p[12], p[13], p[14], p[15]);
+    }
+
+    if (s != 0) {
+        if (e) {
+            dst = ngx_sprintf(dst, "%%25%ud", s);
+        } else {
+            dst = ngx_sprintf(dst, "%%%ud", s);
+        }
     }
 
     return dst - text;
