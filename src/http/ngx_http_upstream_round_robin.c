@@ -321,7 +321,11 @@ ngx_http_upstream_create_round_robin_peer(ngx_http_request_t *r,
                 return NGX_ERROR;
             }
 
-            len = ngx_inet_ntop(AF_INET, &ur->addrs[i], p, NGX_INET_ADDRSTRLEN);
+            /*
+             * XXX roth -- none of this code (see above,
+             * NGX_INET_ADDRSTRLEN) will work with IPv6
+             */
+            len = ngx_inet_ntop(AF_INET, &ur->addrs[i], 0, 0, p, NGX_INET_ADDRSTRLEN);
             len = ngx_sprintf(&p[len], ":%d", ur->port) - p;
 
             sin = ngx_pcalloc(r->pool, sizeof(struct sockaddr_in));
